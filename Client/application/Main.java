@@ -2,11 +2,12 @@ package application;
 	
 import java.io.IOException;
 
+import controller.ClientController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 
 
 public class Main extends Application {
@@ -36,6 +37,9 @@ public class Main extends Application {
 
 		rootLayout = loader.load();
 		Scene scene = new Scene(rootLayout);
+		
+		ClientController clientController = loader.getController();
+		clientController.setMain(this);
 		
 		primaryStage.setScene(scene);
 		primaryStage.setTitle(TITLE);

@@ -8,14 +8,19 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.text.Text;
+import javafx.scene.control.PasswordField;
 
 public class ClientController implements Initializable {
 
+	@FXML PasswordField passwordTf;
+	@FXML Button loginBtn;
+	@FXML Button connectionBtn;
+	@FXML Text statusTxt;
+	
 	private static final String NOT_CONNECTED = "Not connected";
-	private static final String CONNECTED_BTN = "Disconnect";
-	private static final String DISCONNECTED_BTN = "Connect"; 
-	@FXML Button connectionButton;
-	@FXML Text connectionText;
+	private static final String CONNECTED = "Connected";
+	private static final String SET_OFF = "Disconnect";
+	private static final String SET_ON = "Connect"; 
 	
 	private Main main;
 	
@@ -25,13 +30,31 @@ public class ClientController implements Initializable {
 
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-		connectionButton.setText(DISCONNECTED_BTN);
-		connectionText.setText(NOT_CONNECTED);
+		connectionBtn.setText(SET_ON);
+		statusTxt.setText(NOT_CONNECTED);
+		loginBtn.setDisable(true);
 	}
 
 	@FXML public void connectionButtonAction() {
 		ConnectionThread connectionThread = new ConnectionThread();
+		connectionThread.setClientController(this);
 		connectionThread.start();
+	}
+
+	@FXML public void loginAction() {
+		
+	}
+	
+	public void setClientStatus(boolean connected) {
+		if(connected) {
+			connectionBtn.setText("AASDASD");
+			statusTxt.setText(CONNECTED);
+			loginBtn.setDisable(false);
+		} else {
+			connectionBtn.setText(SET_ON);
+			statusTxt.setText(NOT_CONNECTED);
+			loginBtn.setDisable(true);
+		}
 	}
 
 }

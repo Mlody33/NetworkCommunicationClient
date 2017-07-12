@@ -12,9 +12,9 @@ import javafx.scene.control.PasswordField;
 
 public class ClientController implements Initializable {
 
-	@FXML PasswordField passwordTf;
 	@FXML Button loginBtn;
 	@FXML Button connectionBtn;
+	@FXML PasswordField passwordTf;
 	@FXML Text statusTxt;
 	
 	private static final String NOT_CONNECTED = "Not connected";
@@ -47,7 +47,7 @@ public class ClientController implements Initializable {
 	
 	public void setClientStatus(boolean connected) {
 		if(connected) {
-			connectionBtn.setText("AASDASD");
+			connectionBtn.setText(SET_OFF);
 			statusTxt.setText(CONNECTED);
 			loginBtn.setDisable(false);
 		} else {

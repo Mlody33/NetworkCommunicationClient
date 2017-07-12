@@ -2,10 +2,10 @@ package controller;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.time.LocalDate;
 
+import javafx.application.Platform;
 import model.Client;
 
 public class ConnectionThread extends Thread {
@@ -15,10 +15,11 @@ public class ConnectionThread extends Thread {
 	private Client clientData;
 	private boolean connected = false;
 	private ClientController clientController;
-	
+
 	public void setClientController(ClientController clientController) {
 		this.clientController = clientController;
 	}
+	
 	
 	@Override
 	public void run() {
@@ -31,7 +32,13 @@ public class ConnectionThread extends Thread {
 		}
 		
 		connected = true;
-		clientController.setClientStatus(connected);
+		
+		Platform.runLater(new Runnable(){
+            @Override
+            public void run() {
+            	clientController.setClientStatus(connected);
+            }
+        });
 		
 		try {
 			outcomeClientData = new ObjectOutputStream(clientSocket.getOutputStream());

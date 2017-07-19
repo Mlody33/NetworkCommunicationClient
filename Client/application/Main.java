@@ -1,6 +1,7 @@
 package application;
 	
 import java.io.IOException;
+import java.util.Random;
 
 import controller.ClientController;
 import javafx.application.Application;
@@ -12,7 +13,8 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 	
-	private static final String TITLE = "KLIENT #";
+	private static final String TITLE = "CLIENT";
+	private static final int CLIENT_NUMBER = new Random().nextInt(89)+10;
 	private Stage primaryStage;
 	private BorderPane rootLayout;
 	
@@ -42,9 +44,13 @@ public class Main extends Application {
 		clientController.setMain(this);
 		
 		primaryStage.setScene(scene);
-		primaryStage.setTitle(TITLE);
+		primaryStage.setTitle(TITLE + " " + CLIENT_NUMBER);
 		primaryStage.show();
 		
+	}
+	
+	public int getClientNumber() {
+		return CLIENT_NUMBER;
 	}
 	
 }

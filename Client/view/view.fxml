@@ -32,8 +32,8 @@
    <center>
       <VBox alignment="TOP_CENTER" spacing="20.0" BorderPane.alignment="CENTER">
          <children>
-            <PasswordField fx:id="passwordTf" alignment="CENTER" promptText="enter password" />
-            <Button fx:id="loginBtn" disable="true" mnemonicParsing="false" onAction="#loginAction" prefHeight="25.0" prefWidth="263.0" text="Login" />
+            <PasswordField fx:id="authorizationCodeTf" alignment="CENTER" promptText="enter password" />
+            <Button fx:id="authorizationBtn" disable="true" mnemonicParsing="false" onAction="#authorizationAction" prefHeight="25.0" prefWidth="263.0" text="Login" />
             <Separator prefWidth="200.0" />
          </children>
          <padding>

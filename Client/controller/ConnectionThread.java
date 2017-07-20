@@ -89,6 +89,8 @@ public class ConnectionThread extends Thread {
 		        public void run() {
 					if(main.getClientData().isAuthorized())
 						clientController.setUIAuthorized();
+					else
+						clientController.setUINotAuthorized();
 				}
 			});
 		} catch (ClassNotFoundException | IOException e) {

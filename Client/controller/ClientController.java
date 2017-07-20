@@ -60,6 +60,10 @@ public class ClientController implements Initializable {
 		statusTxt.setText(StatusTextDB.CLIENT_AUTHORIZED.get());
 	}
 	
+	public void setUINotAuthorized() {
+		statusTxt.setText(StatusTextDB.CLIENT_NOT_AUTHORIZED.get());
+	}
+	
 	public int getTypedAuthorizationCode() {
 		return Integer.parseInt(authorizationCodeTf.getText());
 	}

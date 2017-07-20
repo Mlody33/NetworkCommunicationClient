@@ -5,6 +5,7 @@ public enum StatusTextDB {
 	CLIENT_NOT_CONNECTED("Not connected"),
 	CLIENT_CONNECTED("Connected"),
 	CLIENT_AUTHORIZED("Authorized"),
+	CLIENT_NOT_AUTHORIZED("Not authorized"),
 	SET_APP_OFF("Disconnect"),
 	SET_APP_ON("Connect");
 	

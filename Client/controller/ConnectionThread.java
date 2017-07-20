@@ -16,9 +16,6 @@ public class ConnectionThread extends Thread {
 	private ObjectOutputStream outcomeClientData;
 	private ObjectInputStream incomeClientData;
 	
-	private boolean connected = false;
-	private boolean authorized = false;
-	
 	private Client clientData;
 	private ClientController clientController;
 	private Main main;
@@ -33,26 +30,17 @@ public class ConnectionThread extends Thread {
 	
 	@Override
 	public void run() {
-		connected = createClientSocket();
+		clientData.setConnected(createClientSocket());
 		Platform.runLater(new Runnable(){
             @Override
             public void run() {
-            	clientController.setClientAppStatus(connected, authorized);
+            	if(clientData.isConnected())
+            		clientController.setUIConnected();
+            	else
+            		clientController.setUINotConnected();
             }
         });
-		connected = createInputOutputStream();
-	}
-
-	private boolean createInputOutputStream() {
-		try {
-			outcomeClientData = new ObjectOutputStream(clientSocket.getOutputStream());
-			incomeClientData = new ObjectInputStream(clientSocket.getInputStream());
-			return true;
-		} catch (IOException e1) {
-			closeConnection();
-			e1.printStackTrace();
-			return false;
-		}
+		createInputOutputStream();
 	}
 
 	private boolean createClientSocket() {
@@ -65,15 +53,23 @@ public class ConnectionThread extends Thread {
 			return false;
 		}
 	}
+	
+	private void createInputOutputStream() {
+		try {
+			outcomeClientData = new ObjectOutputStream(clientSocket.getOutputStream());
+			incomeClientData = new ObjectInputStream(clientSocket.getInputStream());
+		} catch (IOException e1) {
+			closeConnection();
+			e1.printStackTrace();
+		}
+	}
 
 	public void sendAuthorizationData() {
-		clientData = new Client("NAZWA", clientController.getTypedAuthorizationCode(), main.getClientNumber(), LocalDate.now(), authorized);
-		
 		try {
+			clientData = new Client(main.getClientNumber(), clientData.isConnected(), clientController.getTypedAuthorizationCode(), clientData.isAuthorized(), LocalDate.now());
 			outcomeClientData.writeObject(clientData);
 			outcomeClientData.flush();
 			System.out.println("[C]Object send");
-			checkAuthorization();
 		} catch (IOException e) {
 			System.err.println("Error while sending data");
 			e.printStackTrace();
@@ -81,21 +77,19 @@ public class ConnectionThread extends Thread {
 		}
 	}
 	
-	private void checkAuthorization() {
+	public void checkAuthorizationStatus() {
 		try {
 			clientData = (Client) incomeClientData.readObject();
 			System.out.println("[C]Object received");
 			System.out.println(clientData.toString());
 			System.out.println("CHECK AUTHORIZATION:"+clientData.isAuthorized());
-			authorized = clientData.isAuthorized();
-			if(clientData.isAuthorized()) {
-				Platform.runLater(new Runnable(){
-		            @Override
-		            public void run() {
-		            	clientController.setClientAppStatus(connected, authorized);
-		            }
-		        });
-			}
+			Platform.runLater(new Runnable(){
+				@Override
+		        public void run() {
+					if(clientData.isAuthorized())
+						clientController.setUIAuthorized();
+				}
+			});
 		} catch (ClassNotFoundException | IOException e) {
 			e.printStackTrace();
 		}
@@ -105,8 +99,9 @@ public class ConnectionThread extends Thread {
 		try {
 			clientSocket.close();
 			outcomeClientData.close();
-			connected = false;
-			clientController.setClientAppStatus(connected, authorized);
+			clientData.setConnected(false);
+			clientData.setAuthorized(false);
+			clientController.setUINotConnected();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

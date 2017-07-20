@@ -14,7 +14,7 @@
    <bottom>
       <HBox alignment="CENTER_RIGHT" spacing="10.0" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="connectionBtn" mnemonicParsing="false" onAction="#connectionButtonAction" prefHeight="25.0" prefWidth="118.0" text="Connect" />
+            <Button fx:id="connectionBtn" mnemonicParsing="false" onAction="#connectClientToServer" prefHeight="25.0" prefWidth="118.0" text="Connect" />
             <Text fx:id="statusTxt" strokeType="OUTSIDE" strokeWidth="0.0" text="Not connected" textAlignment="CENTER" wrappingWidth="196.826171875">
                <font>
                   <Font size="14.0" />
@@ -32,8 +32,8 @@
    <center>
       <VBox alignment="TOP_CENTER" spacing="20.0" BorderPane.alignment="CENTER">
          <children>
-            <PasswordField fx:id="authorizationCodeTf" alignment="CENTER" promptText="enter password" />
-            <Button fx:id="authorizationBtn" disable="true" mnemonicParsing="false" onAction="#authorizationAction" prefHeight="25.0" prefWidth="263.0" text="Login" />
+            <PasswordField fx:id="authorizationCodeTf" alignment="CENTER" promptText="enter authorization code" />
+            <Button fx:id="authorizationBtn" disable="true" mnemonicParsing="false" onAction="#authorizeClient" prefHeight="25.0" prefWidth="263.0" text="Login" />
             <Separator prefWidth="200.0" />
          </children>
          <padding>

@@ -16,7 +16,7 @@ public class ConnectionThread extends Thread {
 	private ObjectOutputStream outcomeClientData;
 	private ObjectInputStream incomeClientData;
 	
-	private Client clientData;
+	private Client controlClientData;
 	private ClientController clientController;
 	private Main main;
 
@@ -30,11 +30,11 @@ public class ConnectionThread extends Thread {
 	
 	@Override
 	public void run() {
-		clientData.setConnected(createClientSocket());
+		main.getClientData().setConnected(createClientSocket());
 		Platform.runLater(new Runnable(){
             @Override
             public void run() {
-            	if(clientData.isConnected())
+            	if(main.getClientData().isConnected())
             		clientController.setUIConnected();
             	else
             		clientController.setUINotConnected();
@@ -66,8 +66,8 @@ public class ConnectionThread extends Thread {
 
 	public void sendAuthorizationData() {
 		try {
-			clientData = new Client(main.getClientNumber(), clientData.isConnected(), clientController.getTypedAuthorizationCode(), clientData.isAuthorized(), LocalDate.now());
-			outcomeClientData.writeObject(clientData);
+			Client controlClientData = new Client(main.getClientData().getClientNumber(), main.getClientData().isConnected(), clientController.getTypedAuthorizationCode(), main.getClientData().isAuthorized(), LocalDate.now());
+			outcomeClientData.writeObject(controlClientData);
 			outcomeClientData.flush();
 			System.out.println("[C]Object send");
 		} catch (IOException e) {
@@ -79,14 +79,15 @@ public class ConnectionThread extends Thread {
 	
 	public void checkAuthorizationStatus() {
 		try {
-			clientData = (Client) incomeClientData.readObject();
+			Client controlClientData = (Client) incomeClientData.readObject();
 			System.out.println("[C]Object received");
-			System.out.println(clientData.toString());
-			System.out.println("CHECK AUTHORIZATION:"+clientData.isAuthorized());
+			System.out.println(controlClientData.toString());
+			System.out.println("CHECK AUTHORIZATION:"+controlClientData.isAuthorized());
+			main.getClientData().setAuthorized(controlClientData.isAuthorized());
 			Platform.runLater(new Runnable(){
 				@Override
 		        public void run() {
-					if(clientData.isAuthorized())
+					if(main.getClientData().isAuthorized())
 						clientController.setUIAuthorized();
 				}
 			});
@@ -99,8 +100,8 @@ public class ConnectionThread extends Thread {
 		try {
 			clientSocket.close();
 			outcomeClientData.close();
-			clientData.setConnected(false);
-			clientData.setAuthorized(false);
+			main.getClientData().setConnected(false);
+			main.getClientData().setAuthorized(false);
 			clientController.setUINotConnected();
 		} catch (IOException e) {
 			e.printStackTrace();

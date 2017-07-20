@@ -1,6 +1,7 @@
 package application;
 
 public enum StatusTextDB {
+	TITLE_OF_APP("CLIENT"),
 	CLIENT_NOT_CONNECTED("Not connected"),
 	CLIENT_CONNECTED("Connected"),
 	CLIENT_AUTHORIZED("Authorized"),

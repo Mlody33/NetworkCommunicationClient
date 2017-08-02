@@ -5,10 +5,12 @@ import java.util.Random;
 
 import controller.ClientController;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import model.Client;
 
 
@@ -48,7 +50,13 @@ public class Main extends Application {
 		primaryStage.setScene(scene);
 		primaryStage.setTitle(StatusTextDB.TITLE_OF_APP.get() + " " + clientData.getClientNumber());
 		primaryStage.show();
-	}
+		
+		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+			@Override
+			public void handle(WindowEvent arg0) {
+				System.out.println("Clsoe");
+			}
+		});	}
 	
 	public Client getClientData() {
 		return this.clientData;

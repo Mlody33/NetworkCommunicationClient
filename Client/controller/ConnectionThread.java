@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.time.LocalDate;
+import java.util.logging.Logger;
 
 import application.Main;
 import javafx.application.Platform;
@@ -12,6 +13,7 @@ import model.Client;
 
 public class ConnectionThread extends Thread {
 	
+	private Logger log = Logger.getLogger("Client"+this.getClass().getName());
 	private Socket clientSocket;
 	private ObjectOutputStream outcomeClientData;
 	private ObjectInputStream incomeClientData;
@@ -30,7 +32,10 @@ public class ConnectionThread extends Thread {
 	
 	@Override
 	public void run() {
-		main.getClientData().setConnected(createClientSocket());
+		if(createClientSocket())
+			main.getClientData().setConnected();
+		else
+			main.getClientData().setNotConnected();
 		Platform.runLater(new Runnable(){
             @Override
             public void run() {
@@ -66,12 +71,12 @@ public class ConnectionThread extends Thread {
 
 	public void sendAuthorizationData() {
 		try {
-			Client controlClientData = new Client(main.getClientData().getClientNumber(), main.getClientData().isConnected(), clientController.getTypedAuthorizationCode(), main.getClientData().isAuthorized(), LocalDate.now());
+			controlClientData = new Client(main.getClientData().getClientNumber(), main.getClientData().isConnected(), clientController.getTypedAuthorizationCode(), main.getClientData().isAuthorized(), LocalDate.now());
 			outcomeClientData.writeObject(controlClientData);
 			outcomeClientData.flush();
-			System.out.println("[C]Object send");
+			log.info("[C]Object send");
 		} catch (IOException e) {
-			System.err.println("Error while sending data");
+			log.warning("Error while sending data");
 			e.printStackTrace();
 			closeConnection();
 		}
@@ -80,10 +85,11 @@ public class ConnectionThread extends Thread {
 	public void checkAuthorizationStatus() {
 		try {
 			Client controlClientData = (Client) incomeClientData.readObject();
-			System.out.println("[C]Object received");
-			System.out.println(controlClientData.toString());
-			System.out.println("CHECK AUTHORIZATION:"+controlClientData.isAuthorized());
-			main.getClientData().setAuthorized(controlClientData.isAuthorized());
+			log.info("[C]Object received: " + controlClientData.toString() + " AUTHORIZATION IS: "+controlClientData.isAuthorized());
+			if(controlClientData.isAuthorized())
+				main.getClientData().setAuthorized();
+			else 
+				main.getClientData().setNotAuthorized();
 			Platform.runLater(new Runnable(){
 				@Override
 		        public void run() {
@@ -102,8 +108,8 @@ public class ConnectionThread extends Thread {
 		try {
 			clientSocket.close();
 			outcomeClientData.close();
-			main.getClientData().setConnected(false);
-			main.getClientData().setAuthorized(false);
+			main.getClientData().setNotConnected();
+			main.getClientData().setNotAuthorized();
 			clientController.setUINotConnected();
 		} catch (IOException e) {
 			e.printStackTrace();

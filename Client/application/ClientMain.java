@@ -14,16 +14,15 @@ import javafx.stage.WindowEvent;
 import model.Client;
 
 
-public class Main extends Application {
+public class ClientMain extends Application {
 	
-	private Client clientData = new Client(new Random().nextInt(89)+10);
+	private Client clientData = new Client();
 	private Stage primaryStage;
 	private BorderPane rootLayout;
 	
 	@Override
 	public void start(Stage primaryStage) {
 		this.primaryStage = primaryStage;
-		
 		try {
 			initMainView();
 		} catch(Exception e) {
@@ -37,7 +36,7 @@ public class Main extends Application {
 	
 	private void initMainView() throws IOException {
 		FXMLLoader loader = new FXMLLoader();
-		loader.setLocation(Main.class.getResource("../view/view.fxml"));
+		loader.setLocation(ClientMain.class.getResource("../view/ClientView.fxml"));
 
 		rootLayout = loader.load();
 		Scene scene = new Scene(rootLayout);
@@ -51,12 +50,14 @@ public class Main extends Application {
 		primaryStage.setTitle(StatusTextDB.TITLE_OF_APP.get() + " " + clientData.getClientNumber());
 		primaryStage.show();
 		
-		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-			@Override
-			public void handle(WindowEvent arg0) {
-				System.out.println("Clsoe");
-			}
-		});	}
+			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+				@Override
+				public void handle(WindowEvent arg0) {
+					System.out.println("Clsoe");
+				}
+			});
+			
+		}
 	
 	public Client getClientData() {
 		return this.clientData;

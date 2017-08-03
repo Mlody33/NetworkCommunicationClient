@@ -1,77 +1,118 @@
 package controller;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.time.LocalDate;
+import java.util.logging.Logger;
 
+import application.ClientMain;
 import javafx.application.Platform;
 import model.Client;
 
 public class ConnectionThread extends Thread {
 	
+	private Logger log = Logger.getLogger("Client"+this.getClass().getName());
 	private Socket clientSocket;
-	private ObjectOutputStream outcomeClientData;
-	private Client clientData;
-	private boolean connected = false;
+	private ObjectOutputStream outcomeStream;
+	private ObjectInputStream incomeStream;
+	
 	private ClientController clientController;
+	private ClientMain main;
 
 	public void setClientController(ClientController clientController) {
 		this.clientController = clientController;
 	}
 	
+	public void setMain(ClientMain main) {
+		this.main = main;
+	}
 	
 	@Override
 	public void run() {
-		
-		try {
-			clientSocket = new Socket("localhost", 5588);
-		} catch (IOException e) {
-			closeConnection();
-			e.printStackTrace();
-		}
-		
-		connected = true;
-		
+		if(createClientSocket())
+			main.getClientData().setConnected();
+		else
+			main.getClientData().setNotConnected();
 		Platform.runLater(new Runnable(){
             @Override
             public void run() {
-            	clientController.setClientStatus(connected);
+            	if(main.getClientData().isConnected()) {
+            		clientController.setUIConnected();
+            		clientController.setClientIdentyfier();
+            	} else
+            		clientController.setUINotConnected();
             }
         });
-		
+		createInputOutputStream();
+	}
+
+	private boolean createClientSocket() {
 		try {
-			outcomeClientData = new ObjectOutputStream(clientSocket.getOutputStream());
-			System.out.println("[C]Created outcome stream");
+			clientSocket = new Socket("localhost", 5588);
+			return true;
+		} catch (IOException e) {
+			closeConnection();
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	private void createInputOutputStream() {
+		try {
+			outcomeStream = new ObjectOutputStream(clientSocket.getOutputStream());
+			incomeStream = new ObjectInputStream(clientSocket.getInputStream());
 		} catch (IOException e1) {
 			closeConnection();
-			System.err.println("Error while creating outcome stream");
 			e1.printStackTrace();
 		}
-		
-		clientData = new Client("NAZWA", 0, LocalDate.now());
-		System.out.println(clientData.toString());
-		
+	}
+	
+	public void sendClientDataToServer() {
 		try {
-			outcomeClientData.writeObject(clientData);
-			outcomeClientData.flush();
-			System.out.println("[C]Object send");
+			outcomeStream.writeObject(main.getClientData());
+			outcomeStream.flush();
 		} catch (IOException e) {
-			System.err.println("Error while sending data");
-			e.printStackTrace();
+			log.warning("Error while sending object to server");
 			closeConnection();
+			e.printStackTrace();
 		}
+	}
+	
+	public void readClientDataFromServer() {
+		try {
+			Client controlClientData = (Client) incomeStream.readObject();
+			main.getClientData().setClient(controlClientData);
+		} catch (ClassNotFoundException | IOException e) {
+			log.warning("Error while reading object from server");
+			closeConnection();
+			e.printStackTrace();
+		}
+	}
+
+	public void checkAuthorizationStatus() {
+		Platform.runLater(new Runnable(){
+			@Override
+	        public void run() {
+				if(main.getClientData().isAuthorized())
+					clientController.setUIAuthorized();
+				else
+					clientController.setUINotAuthorized();
+			}
+		});
 	}
 	
 	public void closeConnection() {
 		try {
 			clientSocket.close();
-			outcomeClientData.close();
-			connected = false;
-			clientController.setClientStatus(connected);
+			outcomeStream.close();
+			main.getClientData().setNotConnected();
+			main.getClientData().setNotAuthorized();
+			clientController.setUINotConnected();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+
 
 }

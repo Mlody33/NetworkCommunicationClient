@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.time.LocalDateTime;
 import java.util.logging.Logger;
 
 import application.ClientMain;
@@ -15,10 +14,9 @@ public class ConnectionThread extends Thread {
 	
 	private Logger log = Logger.getLogger("Client"+this.getClass().getName());
 	private Socket clientSocket;
-	private ObjectOutputStream outcomeClientData;
-	private ObjectInputStream incomeClientData;
+	private ObjectOutputStream outcomeStream;
+	private ObjectInputStream incomeStream;
 	
-	private Client controlClientData; //FIXME use general object in main
 	private ClientController clientController;
 	private ClientMain main;
 
@@ -62,86 +60,52 @@ public class ConnectionThread extends Thread {
 	
 	private void createInputOutputStream() {
 		try {
-			outcomeClientData = new ObjectOutputStream(clientSocket.getOutputStream());
-			incomeClientData = new ObjectInputStream(clientSocket.getInputStream());
+			outcomeStream = new ObjectOutputStream(clientSocket.getOutputStream());
+			incomeStream = new ObjectInputStream(clientSocket.getInputStream());
 		} catch (IOException e1) {
 			closeConnection();
 			e1.printStackTrace();
 		}
 	}
 	
-	public void sendDataToServer() {
+	public void sendClientDataToServer() {
 		try {
-			outcomeClientData.writeObject(controlClientData);
-			outcomeClientData.flush();
+			outcomeStream.writeObject(main.getClientData());
+			outcomeStream.flush();
 		} catch (IOException e) {
-			log.warning("Error while sending data");
+			log.warning("Error while sending object to server");
 			closeConnection();
 			e.printStackTrace();
 		}
 	}
 	
-	public void readDataFromServer() {
+	public void readClientDataFromServer() {
 		try {
-			controlClientData = (Client) incomeClientData.readObject();
+			Client controlClientData = (Client) incomeStream.readObject();
+			main.getClientData().setClient(controlClientData);
 		} catch (ClassNotFoundException | IOException e) {
+			log.warning("Error while reading object from server");
 			closeConnection();
 			e.printStackTrace();
 		}
 	}
 
-	public void sendAuthorizationData() {
-		try {
-			controlClientData = new Client(main.getClientData().getClientNumber(), main.getClientData().isConnected(), clientController.getTypedAuthorizationCode(), main.getClientData().isAuthorized(), LocalDateTime.now());
-			outcomeClientData.writeObject(controlClientData);
-			outcomeClientData.flush();
-			log.info("[C]Object send");
-		} catch (IOException e) {
-			log.warning("Error while sending data");
-			e.printStackTrace();
-			closeConnection();
-		}
-	}
-	
 	public void checkAuthorizationStatus() {
-		try {
-			controlClientData = (Client) incomeClientData.readObject();
-			log.info("[C]Object received: " + controlClientData.toString() + " AUTHORIZATION IS: "+controlClientData.isAuthorized());
-			if(controlClientData.isAuthorized()) {
-				main.getClientData().setAuthorized();
-				main.getClientData().setAuthorizationCode(controlClientData.getAuthorizationCode());
-			} else 
-				main.getClientData().setNotAuthorized();
-			Platform.runLater(new Runnable(){
-				@Override
-		        public void run() {
-					if(main.getClientData().isAuthorized())
-						clientController.setUIAuthorized();
-					else
-						clientController.setUINotAuthorized();
-				}
-			});
-		} catch (ClassNotFoundException | IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-
-	public void sendDisconnectSignal() {
-		try {
-			outcomeClientData.writeObject(main.getClientData());
-			outcomeClientData.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-			closeConnection();
-		}
-		log.info("[C]Send signal to disconnect");
+		Platform.runLater(new Runnable(){
+			@Override
+	        public void run() {
+				if(main.getClientData().isAuthorized())
+					clientController.setUIAuthorized();
+				else
+					clientController.setUINotAuthorized();
+			}
+		});
 	}
 	
 	public void closeConnection() {
 		try {
 			clientSocket.close();
-			outcomeClientData.close();
+			outcomeStream.close();
 			main.getClientData().setNotConnected();
 			main.getClientData().setNotAuthorized();
 			clientController.setUINotConnected();

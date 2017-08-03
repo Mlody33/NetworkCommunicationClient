@@ -6,8 +6,11 @@ public enum StatusTextDB {
 	CLIENT_CONNECTED("Connected"),
 	CLIENT_AUTHORIZED("Authorized"),
 	CLIENT_NOT_AUTHORIZED("Not authorized"),
-	SET_APP_OFF("Disconnect"),
-	SET_APP_ON("Connect");
+	SET_APP_OFFLINE("Disconnect"),
+	SET_APP_ONLINE("Connect"),
+	OK("OK"),
+	NONE("NONE"),
+	NOT("NOT");
 	
 	private String statusText;
 	

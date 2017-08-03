@@ -1,7 +1,6 @@
 package controller;
 
 import java.net.URL;
-import java.time.LocalDateTime;
 import java.util.ResourceBundle;
 
 import application.ClientMain;
@@ -13,7 +12,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-import model.Client;
 
 public class ClientController implements Initializable {
 
@@ -43,7 +41,10 @@ public class ClientController implements Initializable {
 
 	@FXML
 	public void connectClientToServer() {
-		connectClient();
+		if(main.getClientData().isConnected())
+			disconnectClient();
+		else
+			connectClient();
 	}
 
 	private void connectClient() {
@@ -58,16 +59,15 @@ public class ClientController implements Initializable {
 	private void disconnectClient() {
 		main.getClientData().setSignalToCommunicationWithServer(Signal.DISCONNECT.get());
 		setUISignal();
-		main.getClientData().setNotConnected();
 		connectionThread.sendClientDataToServer();
 		connectionThread.readClientDataFromServer();
-//		connectionThread.closeConnection();
-//		setUINotAuthorized();
-//		setUINotConnected();
+		connectionThread.closeConnection();
+		setUINotAuthorized();
+		setUINotConnected();
 	}
 	
 	@FXML public void debugConnection() {
-		main.getClientData().setClient(new Client(78, true, 1111, true, LocalDateTime.now()));
+		main.getClientData().setSignalToCommunicationWithServer(4);
 		connectionThread.sendClientDataToServer();
 		connectionThread.readClientDataFromServer();
 	}

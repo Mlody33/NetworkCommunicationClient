@@ -73,7 +73,7 @@ public class ClientController implements Initializable {
 	}
 	
 	@FXML public void debugConnection() {
-		main.getClientData().setClient(new Client(78, true, 1111, true, LocalDateTime.now()));
+		main.getClientData().setClient(new Client(78, true, 1111, false, LocalDateTime.now()));
 		connectionThread.sendClientDataToServer();
 		connectionThread.readClientDataFromServer();
 	}

@@ -61,6 +61,15 @@ public class ClientController implements Initializable {
 		setUISignal();
 		connectionThread.sendClientDataToServer();
 		connectionThread.readClientDataFromServer();
+		connectionThread.closeConnection();
+		setUINotAuthorized();
+		setUINotConnected();
+	}
+	
+	@FXML public void debugConnection() {
+		main.getClientData().setSignalToCommunicationWithServer(4);
+		connectionThread.sendClientDataToServer();
+		connectionThread.readClientDataFromServer();
 	}
 	
 	@FXML
@@ -91,6 +100,7 @@ public class ClientController implements Initializable {
 	
 	public void setUIAuthorized() {
 		statusTxt.setText(StatusTextDB.CLIENT_AUTHORIZED.get());
+		authorizationBtn.setDisable(true);
 		authorizationTxt.setFill(Color.GREEN);
 		authorizationTxt.setText(StatusTextDB.OK.get());
 		authorizationCodeTxt.setFill(Color.GREEN);
@@ -99,6 +109,7 @@ public class ClientController implements Initializable {
 	
 	public void setUINotAuthorized() {
 		statusTxt.setText(StatusTextDB.CLIENT_NOT_AUTHORIZED.get());
+		authorizationBtn.setDisable(false);
 		authorizationTxt.setFill(Color.RED);
 		authorizationTxt.setText(StatusTextDB.NOT.get());
 		authorizationCodeTxt.setFill(Color.RED);

@@ -69,9 +69,12 @@ public class ConnectionThread extends Thread {
 	}
 	
 	public void sendClientDataToServer() {
+		Client clientDataToSend = new Client();
+		clientDataToSend.setClientData(main.getClientData());
 		try {
-			outcomeStream.writeObject(main.getClientData());
+			outcomeStream.writeObject(clientDataToSend);
 			outcomeStream.flush();
+			log.info("Send object to server: " + clientDataToSend.toString());
 		} catch (IOException e) {
 			log.warning("Error while sending object to server");
 			closeConnection();
@@ -81,8 +84,10 @@ public class ConnectionThread extends Thread {
 	
 	public void readClientDataFromServer() {
 		try {
-			Client controlClientData = (Client) incomeStream.readObject();
-			main.getClientData().setClient(controlClientData);
+			Client clientDataToRead = new Client();
+			clientDataToRead = (Client) incomeStream.readObject();
+			main.getClientData().setClientData(clientDataToRead);
+			log.info("Read object from server: " + main.getClientData().toString());
 		} catch (ClassNotFoundException | IOException e) {
 			log.warning("Error while reading object from server");
 			closeConnection();
@@ -108,11 +113,9 @@ public class ConnectionThread extends Thread {
 			outcomeStream.close();
 			main.getClientData().setNotConnected();
 			main.getClientData().setNotAuthorized();
-			clientController.setUINotConnected();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-
 
 }

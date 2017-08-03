@@ -48,6 +48,7 @@ public class ClientMain extends Application {
 		
 		primaryStage.setScene(scene);
 		primaryStage.setTitle(StatusTextDB.TITLE_OF_APP.get() + " " + clientData.getClientNumber());
+		primaryStage.setAlwaysOnTop(true);
 		primaryStage.show();
 		
 			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {

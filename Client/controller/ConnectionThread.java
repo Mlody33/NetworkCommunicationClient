@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import application.ClientMain;
 import javafx.application.Platform;
 import model.Client;
+import model.TestCom;
 
 public class ConnectionThread extends Thread {
 	
@@ -30,21 +31,57 @@ public class ConnectionThread extends Thread {
 	
 	@Override
 	public void run() {
-		if(createClientSocket())
-			main.getClientData().setConnected();
-		else
-			main.getClientData().setNotConnected();
-		Platform.runLater(new Runnable(){
-            @Override
-            public void run() {
-            	if(main.getClientData().isConnected()) {
-            		clientController.setUIConnected();
-            		clientController.setClientIdentyfier();
-            	} else
-            		clientController.setUINotConnected();
-            }
-        });
+		createClientSocket();
 		createInputOutputStream();
+		
+		Client testCom = new Client();
+		testCom.setClientNumber(1234);
+		
+		try {
+			outcomeStream.writeObject(testCom);
+			outcomeStream.flush();
+			log.info("Send object to server: " + testCom.toString());
+		} catch (IOException e) {
+			log.warning("Error while sending object to server");
+			closeConnection();
+			e.printStackTrace();
+		}
+		
+		try {
+			Client testComRead = (Client) incomeStream.readObject();
+			log.info("Read object from server: " + testComRead.toString());
+		} catch (ClassNotFoundException | IOException e) {
+			log.warning("Error while reading object from server");
+			closeConnection();
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public void sendNewObject() {
+		Client testCom = new Client();
+		testCom.setClientNumber(9999);
+		testCom.setAuthorized();
+		testCom.setNotConnected();
+		
+		try {
+			outcomeStream.writeObject(testCom);
+			outcomeStream.flush();
+			log.info("Send object to server: " + testCom.toString());
+		} catch (IOException e) {
+			log.warning("Error while sending object to server");
+			closeConnection();
+			e.printStackTrace();
+		}
+		
+		try {
+			Client testComRead = (Client) incomeStream.readObject();
+			log.info("Read object from server: " + testComRead.toString());
+		} catch (ClassNotFoundException | IOException e) {
+			log.warning("Error while reading object from server");
+			closeConnection();
+			e.printStackTrace();
+		}
 	}
 
 	private boolean createClientSocket() {

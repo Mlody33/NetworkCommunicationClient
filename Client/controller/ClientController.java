@@ -1,7 +1,6 @@
 package controller;
 
 import java.net.URL;
-import java.time.LocalDateTime;
 import java.util.ResourceBundle;
 
 import application.ClientMain;
@@ -13,7 +12,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-import model.Client;
 
 public class ClientController implements Initializable {
 
@@ -43,39 +41,14 @@ public class ClientController implements Initializable {
 
 	@FXML
 	public void connectClientToServer() {
-		if(main.getClientData().isConnected()) {
-			System.out.println("dissconnect");
-			disconnectClient();
-		} else {
-			System.out.println("connect");
-			connectClient();
-		}
-	}
-
-	private void connectClient() {
-		main.getClientData().setSignalToCommunicationWithServer(Signal.CONNECT.get());
-		setUISignal();
 		connectionThread = new ConnectionThread();
 		connectionThread.setClientController(this);
 		connectionThread.setMain(main);
 		connectionThread.start();
 	}
 	
-	private void disconnectClient() {
-		main.getClientData().setSignalToCommunicationWithServer(Signal.DISCONNECT.get());
-		setUISignal();
-		main.getClientData().setNotConnected();
-		connectionThread.sendClientDataToServer();
-		connectionThread.readClientDataFromServer();
-//		connectionThread.closeConnection();
-//		setUINotAuthorized();
-//		setUINotConnected();
-	}
-	
 	@FXML public void debugConnection() {
-		main.getClientData().setClient(new Client(78, true, 1111, false, LocalDateTime.now()));
-		connectionThread.sendClientDataToServer();
-		connectionThread.readClientDataFromServer();
+		connectionThread.sendNewObject();
 	}
 	
 	@FXML

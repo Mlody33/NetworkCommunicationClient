@@ -1,6 +1,7 @@
 package controller;
 
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ResourceBundle;
 
 import application.ClientMain;
@@ -12,6 +13,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import model.Client;
 
 public class ClientController implements Initializable {
 
@@ -41,10 +43,13 @@ public class ClientController implements Initializable {
 
 	@FXML
 	public void connectClientToServer() {
-		if(main.getClientData().isConnected())
+		if(main.getClientData().isConnected()) {
+			System.out.println("dissconnect");
 			disconnectClient();
-		else
+		} else {
+			System.out.println("connect");
 			connectClient();
+		}
 	}
 
 	private void connectClient() {
@@ -59,6 +64,16 @@ public class ClientController implements Initializable {
 	private void disconnectClient() {
 		main.getClientData().setSignalToCommunicationWithServer(Signal.DISCONNECT.get());
 		setUISignal();
+		main.getClientData().setNotConnected();
+		connectionThread.sendClientDataToServer();
+		connectionThread.readClientDataFromServer();
+//		connectionThread.closeConnection();
+//		setUINotAuthorized();
+//		setUINotConnected();
+	}
+	
+	@FXML public void debugConnection() {
+		main.getClientData().setClient(new Client(78, true, 1111, true, LocalDateTime.now()));
 		connectionThread.sendClientDataToServer();
 		connectionThread.readClientDataFromServer();
 	}
@@ -91,6 +106,7 @@ public class ClientController implements Initializable {
 	
 	public void setUIAuthorized() {
 		statusTxt.setText(StatusTextDB.CLIENT_AUTHORIZED.get());
+		authorizationBtn.setDisable(true);
 		authorizationTxt.setFill(Color.GREEN);
 		authorizationTxt.setText(StatusTextDB.OK.get());
 		authorizationCodeTxt.setFill(Color.GREEN);
@@ -99,6 +115,7 @@ public class ClientController implements Initializable {
 	
 	public void setUINotAuthorized() {
 		statusTxt.setText(StatusTextDB.CLIENT_NOT_AUTHORIZED.get());
+		authorizationBtn.setDisable(false);
 		authorizationTxt.setFill(Color.RED);
 		authorizationTxt.setText(StatusTextDB.NOT.get());
 		authorizationCodeTxt.setFill(Color.RED);

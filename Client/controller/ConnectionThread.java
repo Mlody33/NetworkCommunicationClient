@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.time.LocalDateTime;
 import java.util.logging.Logger;
 
 import application.ClientMain;
@@ -45,6 +46,8 @@ public class ConnectionThread extends Thread {
             }
         });
 		createInputOutputStream();
+		sendClientDataToServer();
+		readClientDataFromServer();
 	}
 
 	private boolean createClientSocket() {
@@ -69,10 +72,11 @@ public class ConnectionThread extends Thread {
 	}
 	
 	public void sendClientDataToServer() {
+		Client client = new Client(1111, false, 4444, false, LocalDateTime.now());
 		try {
-			outcomeStream.writeObject(main.getClientData());
+			outcomeStream.writeObject(client);
 			outcomeStream.flush();
-			log.info("Send object to server: " + main.getClientData().toString());
+			log.info("Send object to server: " + client.toString());
 		} catch (IOException e) {
 			log.warning("Error while sending object to server");
 			closeConnection();
@@ -83,7 +87,7 @@ public class ConnectionThread extends Thread {
 	public void readClientDataFromServer() {
 		try {
 			Client controlClientData = (Client) incomeStream.readObject();
-			main.getClientData().setClient(controlClientData);
+//			main.getClientData().setClient(controlClientData);
 			log.info("Read object from server: " + controlClientData.toString());
 //			log.info("-----------------------: " + main.getClientData().toString());
 		} catch (ClassNotFoundException | IOException e) {

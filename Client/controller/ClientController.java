@@ -43,13 +43,7 @@ public class ClientController implements Initializable {
 
 	@FXML
 	public void connectClientToServer() {
-		if(main.getClientData().isConnected()) {
-			System.out.println("dissconnect");
-			disconnectClient();
-		} else {
-			System.out.println("connect");
-			connectClient();
-		}
+		connectClient();
 	}
 
 	private void connectClient() {

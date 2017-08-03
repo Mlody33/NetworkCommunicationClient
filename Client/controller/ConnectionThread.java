@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.logging.Logger;
 
-import application.Main;
+import application.ClientMain;
 import javafx.application.Platform;
 import model.Client;
 
@@ -18,16 +18,16 @@ public class ConnectionThread extends Thread {
 	private ObjectOutputStream outcomeClientData;
 	private ObjectInputStream incomeClientData;
 	
-	private Client controlClientData;
+	private Client controlClientData; //FIXME use general object in main
 	private ClientController clientController;
-	private Main main;
+	private ClientMain main;
 
-	public void setMain(Main main) {
-		this.main = main;
-	}
-	
 	public void setClientController(ClientController clientController) {
 		this.clientController = clientController;
+	}
+	
+	public void setMain(ClientMain main) {
+		this.main = main;
 	}
 	
 	@Override
@@ -39,9 +39,10 @@ public class ConnectionThread extends Thread {
 		Platform.runLater(new Runnable(){
             @Override
             public void run() {
-            	if(main.getClientData().isConnected())
+            	if(main.getClientData().isConnected()) {
             		clientController.setUIConnected();
-            	else
+            		clientController.setClientIdentyfier();
+            	} else
             		clientController.setUINotConnected();
             }
         });
@@ -68,10 +69,30 @@ public class ConnectionThread extends Thread {
 			e1.printStackTrace();
 		}
 	}
+	
+	public void sendDataToServer() {
+		try {
+			outcomeClientData.writeObject(controlClientData);
+			outcomeClientData.flush();
+		} catch (IOException e) {
+			log.warning("Error while sending data");
+			closeConnection();
+			e.printStackTrace();
+		}
+	}
+	
+	public void readDataFromServer() {
+		try {
+			controlClientData = (Client) incomeClientData.readObject();
+		} catch (ClassNotFoundException | IOException e) {
+			closeConnection();
+			e.printStackTrace();
+		}
+	}
 
 	public void sendAuthorizationData() {
 		try {
-			controlClientData = new Client(main.getClientData().getClientNumber(), main.getClientData().isConnected(), clientController.getTypedAuthorizationCode(), main.getClientData().isAuthorized(), LocalDate.now());
+			controlClientData = new Client(main.getClientData().getClientNumber(), main.getClientData().isConnected(), clientController.getTypedAuthorizationCode(), main.getClientData().isAuthorized(), LocalDateTime.now());
 			outcomeClientData.writeObject(controlClientData);
 			outcomeClientData.flush();
 			log.info("[C]Object send");
@@ -84,11 +105,12 @@ public class ConnectionThread extends Thread {
 	
 	public void checkAuthorizationStatus() {
 		try {
-			Client controlClientData = (Client) incomeClientData.readObject();
+			controlClientData = (Client) incomeClientData.readObject();
 			log.info("[C]Object received: " + controlClientData.toString() + " AUTHORIZATION IS: "+controlClientData.isAuthorized());
-			if(controlClientData.isAuthorized())
+			if(controlClientData.isAuthorized()) {
 				main.getClientData().setAuthorized();
-			else 
+				main.getClientData().setAuthorizationCode(controlClientData.getAuthorizationCode());
+			} else 
 				main.getClientData().setNotAuthorized();
 			Platform.runLater(new Runnable(){
 				@Override
@@ -104,6 +126,18 @@ public class ConnectionThread extends Thread {
 		}
 	}
 	
+
+	public void sendDisconnectSignal() {
+		try {
+			outcomeClientData.writeObject(main.getClientData());
+			outcomeClientData.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+			closeConnection();
+		}
+		log.info("[C]Send signal to disconnect");
+	}
+	
 	public void closeConnection() {
 		try {
 			clientSocket.close();
@@ -115,5 +149,6 @@ public class ConnectionThread extends Thread {
 			e.printStackTrace();
 		}
 	}
+
 
 }

@@ -45,6 +45,8 @@ public class ConnectionThread extends Thread {
             }
         });
 		createInputOutputStream();
+		sendClientDataToServer();
+		readClientDataFromServer();
 	}
 
 	private boolean createClientSocket() {

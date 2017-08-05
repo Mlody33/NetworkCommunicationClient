@@ -1,10 +1,10 @@
 package controller;
 
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ResourceBundle;
 
 import application.ClientMain;
-import application.Signal;
 import application.StatusTextDB;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -49,7 +49,7 @@ public class ClientController implements Initializable {
 
 	private void connectClient() {
 		main.getClientData().setSignalToCommunicationWithServer(Signal.CONNECT.get());
-		setUISignal();
+		updateUISignal();
 		connectionThread = new ConnectionThread();
 		connectionThread.setClientController(this);
 		connectionThread.setMain(main);
@@ -58,7 +58,7 @@ public class ClientController implements Initializable {
 	
 	private void disconnectClient() {
 		main.getClientData().setSignalToCommunicationWithServer(Signal.DISCONNECT.get());
-		setUISignal();
+		updateUISignal();
 		connectionThread.sendClientDataToServer();
 		connectionThread.readClientDataFromServer();
 		connectionThread.closeConnection();
@@ -66,20 +66,21 @@ public class ClientController implements Initializable {
 		setUINotConnected();
 	}
 	
-	@FXML public void debugConnection() {
-		main.getClientData().setSignalToCommunicationWithServer(4);
-		connectionThread.sendClientDataToServer();
-		connectionThread.readClientDataFromServer();
-	}
-	
 	@FXML
 	public void authorizeClient() {
 		main.getClientData().setSignalToCommunicationWithServer(Signal.AUTHORIZE.get());
 		main.getClientData().setAuthorizationCode(Integer.parseInt(authorizationCodeTf.getText()));
-		setUISignal();
+		updateUISignal();
 		connectionThread.sendClientDataToServer();
 		connectionThread.readClientDataFromServer();
 		connectionThread.checkAuthorizationStatus();
+	}
+	
+	@FXML public void updateConnection() {
+		main.getClientData().setSignalToCommunicationWithServer(Signal.UPDATE.get());
+		main.getClientData().setTimeConnection(LocalDateTime.now());
+		connectionThread.sendClientDataToServer();
+		connectionThread.readClientDataFromServer();
 	}
 	
 	public void setUIConnected() {
@@ -116,7 +117,7 @@ public class ClientController implements Initializable {
 		authorizationCodeTxt.setText(StatusTextDB.NONE.get());
 	}
 	
-	public void setUISignal() {
+	public void updateUISignal() {
 		signalToCommunicationWithServerTxt.setFill(Color.GREEN);
 		signalToCommunicationWithServerTxt.setText(String.valueOf(main.getClientData().getSignalToCommunicationWithServer()));
 	}

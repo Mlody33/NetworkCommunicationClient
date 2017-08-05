@@ -50,12 +50,12 @@ public class ClientMain extends Application {
 		primaryStage.setTitle(StatusTextDB.TITLE_OF_APP.get() + " " + clientData.getClientNumber());
 		primaryStage.show();
 		
-			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-				@Override
-				public void handle(WindowEvent arg0) {
-					System.out.println("Clsoe");
-				}
-			});
+		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+			@Override
+			public void handle(WindowEvent arg0) {
+				System.out.println("Clsoe");
+			}
+		});
 			
 		}
 	

@@ -48,7 +48,7 @@ public class ClientController implements Initializable {
 	}
 
 	private void connectClient() {
-		main.getClientData().setSignalToCommunicationWithServer(Signal.CONNECT.get());
+		main.getClientData().setSignalToCommunicationWithServer(Signal.CONNECT);
 		updateUISignal();
 		connectionThread = new ConnectionThread();
 		connectionThread.setClientController(this);
@@ -57,7 +57,7 @@ public class ClientController implements Initializable {
 	}
 	
 	private void disconnectClient() {
-		main.getClientData().setSignalToCommunicationWithServer(Signal.DISCONNECT.get());
+		main.getClientData().setSignalToCommunicationWithServer(Signal.DISCONNECT);
 		updateUISignal();
 		connectionThread.sendClientDataToServer();
 		connectionThread.readClientDataFromServer();
@@ -68,7 +68,7 @@ public class ClientController implements Initializable {
 	
 	@FXML
 	public void authorizeClient() {
-		main.getClientData().setSignalToCommunicationWithServer(Signal.AUTHORIZE.get());
+		main.getClientData().setSignalToCommunicationWithServer(Signal.AUTHORIZE);
 		main.getClientData().setAuthorizationCode(Integer.parseInt(authorizationCodeTf.getText()));
 		updateTimeConnection();
 		updateUISignal();
@@ -78,7 +78,7 @@ public class ClientController implements Initializable {
 	}
 	
 	@FXML public void updateConnection() {
-		main.getClientData().setSignalToCommunicationWithServer(Signal.UPDATE.get());
+		main.getClientData().setSignalToCommunicationWithServer(Signal.UPDATE);
 		updateTimeConnection();
 		connectionThread.sendClientDataToServer();
 		connectionThread.readClientDataFromServer();
@@ -135,7 +135,7 @@ public class ClientController implements Initializable {
 	
 	public void updateUISignal() {
 		signalToCommunicationWithServerTxt.setFill(Color.GREEN);
-		signalToCommunicationWithServerTxt.setText(String.valueOf(main.getClientData().getSignalToCommunicationWithServer()));
+		signalToCommunicationWithServerTxt.setText(main.getClientData().getSignalToCommunicationWithServer().name());
 	}
 	
 	public void setClientIdentyfier() {

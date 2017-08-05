@@ -1,7 +1,6 @@
 package controller;
 
 import java.net.URL;
-import java.time.LocalDateTime;
 import java.util.ResourceBundle;
 
 import application.ClientMain;
@@ -17,9 +16,10 @@ public class ClientController implements Initializable {
 
 	@FXML private Button authorizationBtn;
 	@FXML private Button connectionBtn;
+	@FXML private Button updateConnectionBtn;
 	@FXML private PasswordField authorizationCodeTf;
-	@FXML private Text statusTxt;
 	
+	@FXML private Text statusTxt;
 	@FXML private Text identyfierTxt;
 	@FXML private Text lastUpdateTxt;
 	@FXML private Text authorizationTxt;
@@ -70,6 +70,7 @@ public class ClientController implements Initializable {
 	public void authorizeClient() {
 		main.getClientData().setSignalToCommunicationWithServer(Signal.AUTHORIZE.get());
 		main.getClientData().setAuthorizationCode(Integer.parseInt(authorizationCodeTf.getText()));
+		updateTimeConnection();
 		updateUISignal();
 		connectionThread.sendClientDataToServer();
 		connectionThread.readClientDataFromServer();
@@ -78,7 +79,7 @@ public class ClientController implements Initializable {
 	
 	@FXML public void updateConnection() {
 		main.getClientData().setSignalToCommunicationWithServer(Signal.UPDATE.get());
-		main.getClientData().setTimeConnection(LocalDateTime.now());
+		updateTimeConnection();
 		connectionThread.sendClientDataToServer();
 		connectionThread.readClientDataFromServer();
 	}
@@ -87,6 +88,8 @@ public class ClientController implements Initializable {
 		connectionBtn.setText(StatusTextDB.SET_APP_OFFLINE.get());
 		statusTxt.setText(StatusTextDB.CLIENT_CONNECTED.get());
 		authorizationBtn.setDisable(false);
+		authorizationCodeTf.setDisable(false);
+		updateConnectionBtn.setDisable(true);
 		connectionTxt.setFill(Color.GREEN);
 		connectionTxt.setText(StatusTextDB.OK.get());
 	}
@@ -95,13 +98,19 @@ public class ClientController implements Initializable {
 		connectionBtn.setText(StatusTextDB.SET_APP_ONLINE.get());
 		statusTxt.setText(StatusTextDB.CLIENT_NOT_CONNECTED.get());
 		authorizationBtn.setDisable(true);
+		authorizationCodeTf.setDisable(true);
+		updateConnectionBtn.setDisable(true);
 		connectionTxt.setFill(Color.RED);
 		connectionTxt.setText(StatusTextDB.NOT.get());
+		lastUpdateTxt.setFill(Color.RED);
+		lastUpdateTxt.setText(StatusTextDB.NONE.get());
 	}
 	
 	public void setUIAuthorized() {
 		statusTxt.setText(StatusTextDB.CLIENT_AUTHORIZED.get());
 		authorizationBtn.setDisable(true);
+		authorizationCodeTf.setDisable(true);
+		updateConnectionBtn.setDisable(false);
 		authorizationTxt.setFill(Color.GREEN);
 		authorizationTxt.setText(StatusTextDB.OK.get());
 		authorizationCodeTxt.setFill(Color.GREEN);
@@ -111,10 +120,17 @@ public class ClientController implements Initializable {
 	public void setUINotAuthorized() {
 		statusTxt.setText(StatusTextDB.CLIENT_NOT_AUTHORIZED.get());
 		authorizationBtn.setDisable(false);
+		authorizationCodeTf.setDisable(false);
+		updateConnectionBtn.setDisable(true);
 		authorizationTxt.setFill(Color.RED);
 		authorizationTxt.setText(StatusTextDB.NOT.get());
 		authorizationCodeTxt.setFill(Color.RED);
 		authorizationCodeTxt.setText(StatusTextDB.NONE.get());
+	}
+	
+	public void updateTimeConnection() {
+		lastUpdateTxt.setFill(Color.GREEN);
+		lastUpdateTxt.setText(String.valueOf(main.getClientData().getTimeConnection()));
 	}
 	
 	public void updateUISignal() {

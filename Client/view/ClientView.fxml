@@ -33,10 +33,10 @@
       </HBox>
    </bottom>
    <center>
-      <VBox alignment="TOP_CENTER" prefHeight="375.0" spacing="20.0" BorderPane.alignment="CENTER">
+      <VBox alignment="TOP_CENTER" prefHeight="400.0" spacing="20.0" BorderPane.alignment="CENTER">
          <children>
             <PasswordField fx:id="authorizationCodeTf" alignment="CENTER" promptText="enter authorization code" />
-            <Button fx:id="authorizationBtn" disable="true" mnemonicParsing="false" onAction="#authorizeClient" prefHeight="25.0" prefWidth="263.0" text="Authorize" />
+            <Button fx:id="authorizationBtn" disable="true" mnemonicParsing="false" onAction="#authorizeClient" prefWidth="263.0" text="Authorize" />
             <Separator prefWidth="200.0" />
             <GridPane prefWidth="263.0">
               <columnConstraints>
@@ -117,7 +117,7 @@
                   <Insets top="10.0" />
                </VBox.margin>
             </GridPane>
-            <Button mnemonicParsing="false" onAction="#updateConnection" prefHeight="25.0" prefWidth="263.0" text="Update status" />
+            <Button fx:id="updateConnectionBtn" mnemonicParsing="false" onAction="#updateConnection" prefWidth="263.0" text="Update status" />
          </children>
          <padding>
             <Insets bottom="30.0" left="50.0" right="50.0" top="50.0" />

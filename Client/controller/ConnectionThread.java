@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.time.LocalDateTime;
 import java.util.logging.Logger;
 
 import application.ClientMain;
@@ -71,6 +72,7 @@ public class ConnectionThread extends Thread {
 	}
 	
 	public void sendClientDataToServer() {
+		main.getClientData().setTimeConnection(LocalDateTime.now());
 		Client clientDataToSend = new Client();
 		clientDataToSend.setClientData(main.getClientData());
 		try {

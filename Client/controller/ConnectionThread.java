@@ -58,6 +58,8 @@ public class ConnectionThread extends Thread {
 			closeConnection();
 			e.printStackTrace();
 			return false;
+		} catch (NullPointerException e) {
+			return false;
 		}
 	}
 	
@@ -87,8 +89,8 @@ public class ConnectionThread extends Thread {
 	}
 	
 	public void readClientDataFromServer() {
+		Client clientDataToRead = new Client();
 		try {
-			Client clientDataToRead = new Client();
 			clientDataToRead = (Client) incomeStream.readObject();
 			main.getClientData().setClientData(clientDataToRead);
 			log.info("Read object from server: " + main.getClientData().toString());
@@ -99,11 +101,17 @@ public class ConnectionThread extends Thread {
 		}
 	}
 
-	public void checkAuthorizationStatus() {
+	public void checkStatus() {
 		Platform.runLater(new Runnable(){
 			@Override
 	        public void run() {
-				if(main.getClientData().isAuthorized())
+				if(!main.getClientData().isConnected()){
+					main.getClientData().setSignalToCommunicationWithServer(Signal.DISCONNECT);
+					clientController.setUINotAuthorized();
+					clientController.setUINotConnected();
+					clientController.updateUISignal();
+					closeConnection();
+				} else if(main.getClientData().isAuthorized())
 					clientController.setUIAuthorized();
 				else
 					clientController.setUINotAuthorized();
@@ -119,6 +127,10 @@ public class ConnectionThread extends Thread {
 			main.getClientData().setNotAuthorized();
 		} catch (IOException e) {
 			e.printStackTrace();
+			log.warning("IOEXception");
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			log.warning("NULL");
 		}
 	}
 

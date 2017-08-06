@@ -11,7 +11,8 @@ public enum ClientStatuses {
 	OK("OK"),
 	NONE("NONE"),
 	NO("NO"),
-	WRONG_AUTH_FIELD_VALUE("Type authorization code");
+	WRONG_AUTH_FIELD_VALUE("Type authorization code"),
+	CONNECTION_THREAD("CONNECTION_WITH_SERVER_THREAD");
 	
 	private String statusText;
 	

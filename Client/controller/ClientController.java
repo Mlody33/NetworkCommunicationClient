@@ -30,7 +30,7 @@ public class ClientController implements Initializable {
 	@FXML private Text signalToCommunicationWithServerTxt;
 	
 	private ClientMain main;
-	private ConnectionThread connectionThread;
+	private ConnectionWithServer connectionWithServer;
 	
 	public void setMain(ClientMain main) {
 		this.main = main;
@@ -56,18 +56,20 @@ public class ClientController implements Initializable {
 
 	private void connectClient() {
 		main.getClientData().setSignalToCommunicationWithServer(Signal.CONNECT);
-		connectionThread = new ConnectionThread();
-		connectionThread.setClientController(this);
-		connectionThread.setMain(main);
+		connectionWithServer = new ConnectionWithServer();
+		Thread connectionThread = new Thread(connectionWithServer);
+		connectionWithServer.setClientController(this);
+		connectionWithServer.setMain(main);
+		connectionThread.setName(ClientStatuses.CONNECTION_THREAD.get());
 		connectionThread.start();
 	}
 	
 	public void disconnectClient() {
 		main.getClientData().setSignalToCommunicationWithServer(Signal.DISCONNECT);
 		if(main.getClientData().isConnected()) {
-			connectionThread.sendClientDataToServer();
-			connectionThread.readClientDataFromServer();
-			connectionThread.closeConnection();
+			connectionWithServer.sendClientDataToServer();
+			connectionWithServer.readClientDataFromServer();
+			connectionWithServer.closeConnection();
 		}
 	}
 	
@@ -78,9 +80,9 @@ public class ClientController implements Initializable {
 			main.getClientData().setAuthorizationCode(Integer.parseInt(authorizationCodeTf.getText()));
 			updateTimeConnection();
 			updateUISignal();
-			connectionThread.sendClientDataToServer();
-			connectionThread.readClientDataFromServer();
-			connectionThread.checkStatus();
+			connectionWithServer.sendClientDataToServer();
+			connectionWithServer.readClientDataFromServer();
+			connectionWithServer.checkStatus();
 		} catch (NumberFormatException e) {
 			statusTxt.setFill(Color.RED);
 			statusTxt.setText(ClientStatuses.WRONG_AUTH_FIELD_VALUE.get());
@@ -89,9 +91,9 @@ public class ClientController implements Initializable {
 	
 	@FXML public void updateConnection() {
 		main.getClientData().setSignalToCommunicationWithServer(Signal.UPDATE);
-		connectionThread.sendClientDataToServer();
-		connectionThread.readClientDataFromServer();
-		connectionThread.checkStatus();
+		connectionWithServer.sendClientDataToServer();
+		connectionWithServer.readClientDataFromServer();
+		connectionWithServer.checkStatus();
 		updateTimeConnection();
 		updateUISignal();
 	}

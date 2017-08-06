@@ -11,7 +11,7 @@ import application.ClientMain;
 import javafx.application.Platform;
 import model.Client;
 
-public class ConnectionThread extends Thread {
+public class ConnectionWithServer implements Runnable {
 	
 	private Logger log = Logger.getLogger("Client"+this.getClass().getName());
 	private Socket clientSocket;

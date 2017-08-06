@@ -1,7 +1,7 @@
 package application;
 
-public enum StatusTextDB {
-	TITLE_OF_APP("CLIENT"),
+public enum ClientStatuses {
+	CLIENT_TITLE("CLIENT"),
 	CLIENT_NOT_CONNECTED("Not connected"),
 	CLIENT_CONNECTED("Connected"),
 	CLIENT_AUTHORIZED("Authorized"),
@@ -10,11 +10,12 @@ public enum StatusTextDB {
 	SET_APP_ONLINE("Connect"),
 	OK("OK"),
 	NONE("NONE"),
-	NOT("NOT");
+	NO("NO"),
+	WRONG_AUTH_FIELD_VALUE("Type authorization code");
 	
 	private String statusText;
 	
-	private StatusTextDB(String text) {
+	private ClientStatuses(String text) {
 		this.statusText = text;
 	}
 	

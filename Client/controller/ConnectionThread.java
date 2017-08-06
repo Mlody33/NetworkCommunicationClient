@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.time.LocalDateTime;
 import java.util.logging.Logger;
 
 import application.ClientMain;
@@ -45,6 +46,8 @@ public class ConnectionThread extends Thread {
             }
         });
 		createInputOutputStream();
+		sendClientDataToServer();
+		readClientDataFromServer();
 	}
 
 	private boolean createClientSocket() {
@@ -54,6 +57,8 @@ public class ConnectionThread extends Thread {
 		} catch (IOException e) {
 			closeConnection();
 			e.printStackTrace();
+			return false;
+		} catch (NullPointerException e) {
 			return false;
 		}
 	}
@@ -69,6 +74,7 @@ public class ConnectionThread extends Thread {
 	}
 	
 	public void sendClientDataToServer() {
+		main.getClientData().setTimeConnection(LocalDateTime.now());
 		Client clientDataToSend = new Client();
 		clientDataToSend.setClientData(main.getClientData());
 		try {
@@ -83,8 +89,8 @@ public class ConnectionThread extends Thread {
 	}
 	
 	public void readClientDataFromServer() {
+		Client clientDataToRead = new Client();
 		try {
-			Client clientDataToRead = new Client();
 			clientDataToRead = (Client) incomeStream.readObject();
 			main.getClientData().setClientData(clientDataToRead);
 			log.info("Read object from server: " + main.getClientData().toString());
@@ -95,11 +101,17 @@ public class ConnectionThread extends Thread {
 		}
 	}
 
-	public void checkAuthorizationStatus() {
+	public void checkStatus() {
 		Platform.runLater(new Runnable(){
 			@Override
 	        public void run() {
-				if(main.getClientData().isAuthorized())
+				if(!main.getClientData().isConnected()){
+					main.getClientData().setSignalToCommunicationWithServer(Signal.DISCONNECT);
+					clientController.setUINotAuthorized();
+					clientController.setUINotConnected();
+					clientController.updateUISignal();
+					closeConnection();
+				} else if(main.getClientData().isAuthorized())
 					clientController.setUIAuthorized();
 				else
 					clientController.setUINotAuthorized();
@@ -115,6 +127,10 @@ public class ConnectionThread extends Thread {
 			main.getClientData().setNotAuthorized();
 		} catch (IOException e) {
 			e.printStackTrace();
+			log.warning("IOEXception");
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			log.warning("NULL");
 		}
 	}
 

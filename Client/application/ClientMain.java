@@ -47,15 +47,14 @@ public class ClientMain extends Application {
 		clientController.setMain(this);
 		
 		primaryStage.setScene(scene);
-		primaryStage.setTitle(StatusTextDB.TITLE_OF_APP.get() + " " + clientData.getClientNumber());
+		primaryStage.setTitle(ClientStatuses.CLIENT_TITLE.get() + " " + clientData.getClientNumber());
 		primaryStage.show();
-		
-			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-				@Override
-				public void handle(WindowEvent arg0) {
-					System.out.println("Clsoe");
-				}
-			});
+		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+			@Override
+			public void handle(WindowEvent arg0) {
+				clientController.disconnectClient();
+			}
+		});
 			
 		}
 	

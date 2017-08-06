@@ -56,9 +56,9 @@ public class ConnectionThread extends Thread {
 			return true;
 		} catch (IOException e) {
 			closeConnection();
-			e.printStackTrace();
 			return false;
 		} catch (NullPointerException e) {
+			closeConnection();
 			return false;
 		}
 	}
@@ -69,7 +69,6 @@ public class ConnectionThread extends Thread {
 			incomeStream = new ObjectInputStream(clientSocket.getInputStream());
 		} catch (IOException e1) {
 			closeConnection();
-			e1.printStackTrace();
 		}
 	}
 	
@@ -80,11 +79,9 @@ public class ConnectionThread extends Thread {
 		try {
 			outcomeStream.writeObject(clientDataToSend);
 			outcomeStream.flush();
-			log.info("Send object to server: " + clientDataToSend.toString());
 		} catch (IOException e) {
-			log.warning("Error while sending object to server");
+			log.warning("Can't send object");
 			closeConnection();
-			e.printStackTrace();
 		}
 	}
 	
@@ -93,11 +90,9 @@ public class ConnectionThread extends Thread {
 		try {
 			clientDataToRead = (Client) incomeStream.readObject();
 			main.getClientData().setClientData(clientDataToRead);
-			log.info("Read object from server: " + main.getClientData().toString());
 		} catch (ClassNotFoundException | IOException e) {
-			log.warning("Error while reading object from server");
+			log.warning("Can't read object");
 			closeConnection();
-			e.printStackTrace();
 		}
 	}
 
@@ -125,12 +120,8 @@ public class ConnectionThread extends Thread {
 			outcomeStream.close();
 			main.getClientData().setNotConnected();
 			main.getClientData().setNotAuthorized();
-		} catch (IOException e) {
-			e.printStackTrace();
-			log.warning("IOEXception");
-		} catch (NullPointerException e) {
-			e.printStackTrace();
-			log.warning("NULL");
+		} catch (IOException | NullPointerException e) {
+			log.warning("Can't close connection");
 		}
 	}
 

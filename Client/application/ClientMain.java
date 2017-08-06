@@ -55,7 +55,6 @@ public class ClientMain extends Application {
 				clientController.disconnectClient();
 			}
 		});
-			
 		}
 	
 	public Client getClientData() {

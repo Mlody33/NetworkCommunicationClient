@@ -2,6 +2,7 @@ package application;
 
 public enum ClientStatuses {
 	CLIENT_TITLE("CLIENT"),
+	CONNECTION_THREAD("CONNECTION_WITH_SERVER_THREAD"),
 	CLIENT_NOT_CONNECTED("Not connected"),
 	CLIENT_CONNECTED("Connected"),
 	CLIENT_AUTHORIZED("Authorized"),

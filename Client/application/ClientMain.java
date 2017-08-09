@@ -25,7 +25,7 @@ public class ClientMain extends Application {
 		this.primaryStage = primaryStage;
 		try {
 			initMainView();
-		} catch(Exception e) {
+		} catch(IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -55,7 +55,6 @@ public class ClientMain extends Application {
 				clientController.disconnectClient();
 			}
 		});
-			
 		}
 	
 	public Client getClientData() {

@@ -5,14 +5,11 @@ import java.util.Random;
 
 import controller.ClientController;
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import model.Client;
-
 
 public class ClientMain extends Application {
 	
@@ -36,7 +33,7 @@ public class ClientMain extends Application {
 	
 	private void initMainView() throws IOException {
 		FXMLLoader loader = new FXMLLoader();
-		loader.setLocation(ClientMain.class.getResource("../view/ClientView.fxml"));
+		loader.setLocation(ClientMain.class.getResource("/view/ClientView.fxml"));
 
 		rootLayout = loader.load();
 		Scene scene = new Scene(rootLayout);
@@ -49,13 +46,8 @@ public class ClientMain extends Application {
 		primaryStage.setScene(scene);
 		primaryStage.setTitle(ClientStatuses.CLIENT_TITLE.get() + " " + clientData.getClientNumber());
 		primaryStage.show();
-		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-			@Override
-			public void handle(WindowEvent arg0) {
-				clientController.disconnectClient();
-			}
-		});
-		}
+		primaryStage.setOnCloseRequest(arg0 -> clientController.disconnectClient());
+	}
 	
 	public Client getClientData() {
 		return this.clientData;
